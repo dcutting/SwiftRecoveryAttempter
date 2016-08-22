@@ -18,12 +18,12 @@ let errorModal = ErrorModal.app
 
   @IBOutlet weak var window: NSWindow!
 
-  func applicationDidFinishLaunching(aNotification: NSNotification) {
+  func applicationDidFinishLaunching(_ aNotification: Notification) {
     let error = makeError()
 
     switch errorModal {
     case .window:
-      window.presentError(error, modalForWindow: window, delegate: nil, didPresentSelector: nil, contextInfo: nil)
+      window.presentError(error, modalFor: window, delegate: nil, didPresent: nil, contextInfo: nil)
     case .app:
       window.presentError(error)
     }
@@ -42,11 +42,11 @@ let errorModal = ErrorModal.app
 }
 
 class RecoveryAttempter: NSObject {
-  override func attemptRecoveryFromError(error: NSError, optionIndex recoveryOptionIndex: Int, delegate: AnyObject?, didRecoverSelector: Selector, contextInfo: UnsafeMutablePointer<Void>) {
+  override func attemptRecovery(fromError error: NSError, optionIndex recoveryOptionIndex: Int, delegate: AnyObject?, didRecoverSelector: Selector?, contextInfo: UnsafeMutablePointer<Void>?) {
     print("Attempting recovery for window modal error.")
   }
 
-  override func attemptRecoveryFromError(error: NSError, optionIndex recoveryOptionIndex: Int) -> Bool {
+  override func attemptRecovery(fromError error: NSError, optionIndex recoveryOptionIndex: Int) -> Bool {
     print("Attempting recovery for app modal error.")
     return true
   }
