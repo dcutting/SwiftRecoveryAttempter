@@ -8,20 +8,46 @@
 
 import Cocoa
 
-@NSApplicationMain
-class AppDelegate: NSObject, NSApplicationDelegate {
+enum ErrorModal {
+  case window, app
+}
+
+let errorModal = ErrorModal.app
+
+@NSApplicationMain class AppDelegate: NSObject, NSApplicationDelegate {
 
   @IBOutlet weak var window: NSWindow!
 
-
   func applicationDidFinishLaunching(aNotification: NSNotification) {
-    // Insert code here to initialize your application
+    let error = makeError()
+
+    switch errorModal {
+    case .window:
+      window.presentError(error, modalForWindow: window, delegate: nil, didPresentSelector: nil, contextInfo: nil)
+    case .app:
+      window.presentError(error)
+    }
   }
 
-  func applicationWillTerminate(aNotification: NSNotification) {
-    // Insert code here to tear down your application
+  func makeError() -> NSError {
+    let userInfo = [
+      NSLocalizedDescriptionKey: "Error",
+      NSLocalizedRecoverySuggestionErrorKey: "There was a temporary problem.",
+      NSLocalizedRecoveryOptionsErrorKey: ["Try again", "Cancel"],
+      NSRecoveryAttempterErrorKey: RecoveryAttempter()
+    ]
+    let error = NSError(domain: "MyDomain", code: 1, userInfo: userInfo)
+    return error
   }
-
-
 }
 
+class RecoveryAttempter: NSObject {
+  override func attemptRecoveryFromError(error: NSError, optionIndex recoveryOptionIndex: Int, delegate: AnyObject?, didRecoverSelector: Selector, contextInfo: UnsafeMutablePointer<Void>) {
+    print("Attempting recovery for window modal error.")
+  }
+
+  override func attemptRecoveryFromError(error: NSError, optionIndex recoveryOptionIndex: Int) -> Bool {
+    print("Attempting recovery for app modal error.")
+    return true
+  }
+}
