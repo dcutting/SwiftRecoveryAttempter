@@ -30,7 +30,7 @@ let errorModal = ErrorModal.app
   }
 
   func makeError() -> NSError {
-    let userInfo = [
+    let userInfo: [String: Any] = [
       NSLocalizedDescriptionKey: "Error",
       NSLocalizedRecoverySuggestionErrorKey: "There was a temporary problem.",
       NSLocalizedRecoveryOptionsErrorKey: ["Try again", "Cancel"],
@@ -42,7 +42,7 @@ let errorModal = ErrorModal.app
 }
 
 class RecoveryAttempter: NSObject {
-  override func attemptRecovery(fromError error: Error, optionIndex recoveryOptionIndex: Int, delegate: AnyObject?, didRecoverSelector: Selector?, contextInfo: UnsafeMutablePointer<Void>?) {
+  override func attemptRecovery(fromError error: Error, optionIndex recoveryOptionIndex: Int, delegate: Any?, didRecoverSelector: Selector?, contextInfo: UnsafeMutableRawPointer?) {
     print("Attempting recovery for window modal error.")
   }
 
