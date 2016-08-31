@@ -13,14 +13,27 @@ enum ErrorModal {
 }
 
 let errorModal = ErrorModal.app
+let errorToThrow = SatelliteError.antennaFailure
 
 @NSApplicationMain class AppDelegate: NSObject, NSApplicationDelegate {
 
   @IBOutlet weak var window: NSWindow!
 
   func applicationDidFinishLaunching(_ aNotification: Notification) {
-    let error = makeError()
+    do {
+      try launchSatellite()
+    } catch let error as SatelliteError where error == SatelliteError.lowPower {
+      print("Ignoring low power error.")
+    } catch {
+      present(error: error)
+    }
+  }
 
+  func launchSatellite() throws {
+    throw errorToThrow
+  }
+
+  func present(error: Error) {
     switch errorModal {
     case .window:
       window.presentError(error, modalFor: window, delegate: nil, didPresent: nil, contextInfo: nil)
@@ -28,25 +41,28 @@ let errorModal = ErrorModal.app
       window.presentError(error)
     }
   }
-
-  func makeError() -> NSError {
-    let userInfo: [String: Any] = [
-      NSLocalizedDescriptionKey: "Error",
-      NSLocalizedRecoverySuggestionErrorKey: "There was a temporary problem.",
-      NSLocalizedRecoveryOptionsErrorKey: ["Try again", "Cancel"],
-      NSRecoveryAttempterErrorKey: RecoveryAttempter()
-    ]
-    let error = NSError(domain: "MyDomain", code: 1, userInfo: userInfo)
-    return error
-  }
 }
 
-class RecoveryAttempter: NSObject {
-  override func attemptRecovery(fromError error: Error, optionIndex recoveryOptionIndex: Int, delegate: Any?, didRecoverSelector: Selector?, contextInfo: UnsafeMutableRawPointer?) {
+enum SatelliteError: LocalizedError, RecoverableError {
+  case antennaFailure
+  case lowPower
+
+  var errorDescription: String? {
+    switch self {
+    case .antennaFailure: return "Antenna failed"
+    case .lowPower: return "Low power"
+    }
+  }
+
+  var recoveryOptions: [String] {
+    get { return ["Try again", "Cancel"] }
+  }
+
+  func attemptRecovery(optionIndex recoveryOptionIndex: Int, resultHandler handler: (_: Bool) -> Void) {
     print("Attempting recovery for window modal error.")
   }
 
-  override func attemptRecovery(fromError error: Error, optionIndex recoveryOptionIndex: Int) -> Bool {
+  func attemptRecovery(optionIndex recoveryOptionIndex: Int) -> Bool {
     print("Attempting recovery for app modal error.")
     return true
   }
