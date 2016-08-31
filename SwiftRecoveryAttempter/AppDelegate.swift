@@ -60,6 +60,7 @@ enum SatelliteError: LocalizedError, RecoverableError {
 
   func attemptRecovery(optionIndex recoveryOptionIndex: Int, resultHandler handler: (_: Bool) -> Void) {
     print("Attempting recovery for window modal error.")
+    handler(true)
   }
 
   func attemptRecovery(optionIndex recoveryOptionIndex: Int) -> Bool {
